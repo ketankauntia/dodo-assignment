@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { getButtonClass} from "@/lib/ui-utils";
 
 interface UserSubscription {
   plan: string;
@@ -19,8 +21,13 @@ interface UserSubscription {
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [userSubscription, setUserSubscription] = useState<UserSubscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  const status = searchParams.get("status");
+  const sessionId = searchParams.get("session_id");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -33,6 +40,15 @@ export default function DashboardPage() {
       fetchUserSubscription();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (status === "success") {
+      setShowSuccessMessage(true);
+      console.log("Stripe checkout completed, session:", sessionId);
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => setShowSuccessMessage(false), 5000);
+    }
+  }, [status, sessionId]);
 
   const fetchUserSubscription = async () => {
     if (!user) return;
@@ -104,6 +120,35 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Success Message */}
+        {showSuccessMessage && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-green-800">
+                  Payment Successful!
+                </h3>
+                <div className="mt-2 text-sm text-green-700">
+                  <p>Your subscription has been upgraded. It may take a moment for changes to reflect.</p>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={() => setShowSuccessMessage(false)}
+                    className="text-green-800 hover:text-green-900 text-sm font-medium cursor-pointer"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
@@ -186,7 +231,7 @@ export default function DashboardPage() {
               </p>
               <button
                 onClick={() => router.push("/pricing")}
-                className="bg-white text-blue-600 px-6 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors cursor-pointer"
+                className={`bg-white text-blue-600 px-6 py-2 rounded-md font-medium hover:bg-gray-50 transition-colors cursor-pointer`}
               >
                 Upgrade to Pro
               </button>
@@ -195,11 +240,11 @@ export default function DashboardPage() {
             <div className="bg-green-50 border border-green-200 rounded-lg p-6">
               <h3 className="text-xl font-semibold text-green-900 mb-2">Active Subscription</h3>
               <p className="text-green-700 mb-4">
-                You're currently on the {getPlanDisplayName(userSubscription?.plan_code || "")} plan.
+                You&apos;re currently on the {getPlanDisplayName(userSubscription?.plan_code || "")} plan.
               </p>
               <button
                 onClick={() => router.push("/pricing")}
-                className="bg-green-600 text-white px-6 py-2 rounded-md font-medium hover:bg-green-700 transition-colors cursor-pointer"
+                className={getButtonClass('success')}
               >
                 Manage Subscription
               </button>

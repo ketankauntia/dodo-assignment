@@ -128,7 +128,7 @@ export const createCheckoutSession = functions
         customer: customerId,
         mode: plan.mode, // "subscription" | "payment"
         line_items: [{ price: plan.priceId, quantity: 1 }],
-        success_url: `${APP_URL}/pricing?status=success&session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${APP_URL}/dashboard?status=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${APP_URL}/pricing?status=cancel`,
         metadata: { firebaseUID: uid, planCode },
         subscription_data:

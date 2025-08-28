@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../../contexts/AuthContext";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { getButtonClass } from "@/lib/ui-utils";
 
 interface UserPlan {
   plan: string;
@@ -18,7 +20,15 @@ export default function LoginPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [userPlan, setUserPlan] = useState<UserPlan | null>(null);
-  const { user, signIn, signUp, signOut } = useAuth();
+  const { user, signIn, signUp, signOut, loading: authLoading } = useAuth();
+  const router = useRouter();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/dashboard");
+    }
+  }, [user, authLoading, router]);
 
   // Fetch user plan data from Firestore
   useEffect(() => {
@@ -153,7 +163,7 @@ export default function LoginPage() {
                     type="submit"
                     onClick={handleSignIn}
                     disabled={loading}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                    className={`flex-1 ${getButtonClass('primary', loading)}`}
                   >
                     {loading ? "Signing In..." : "Sign In"}
                   </button>
@@ -162,7 +172,7 @@ export default function LoginPage() {
                     type="button"
                     onClick={handleSignUp}
                     disabled={loading}
-                    className="flex-1 bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
+                    className={`flex-1 ${getButtonClass('secondary', loading)}`}
                   >
                     {loading ? "Creating..." : "Sign Up"}
                   </button>
@@ -191,14 +201,14 @@ export default function LoginPage() {
                 <div className="flex space-x-4">
                   <button
                     onClick={() => window.location.href = '/pricing'}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer transition-colors"
+                    className={`flex-1 ${getButtonClass('primary')}`}
                   >
                     Upgrade Plan
                   </button>
                   
                   <button
                     onClick={handleSignOut}
-                    className="flex-1 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 cursor-pointer transition-colors"
+                    className={`flex-1 ${getButtonClass('danger')}`}
                   >
                     Sign Out
                   </button>
