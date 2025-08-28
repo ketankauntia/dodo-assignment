@@ -1,5 +1,16 @@
 # Dodo Payments Boilerplate (Next.js + Firebase + Stripe)
 
+## Demo Video 
+
+[▶️ Watch the demo](https://youtu.be/-uw2EWN6m98)
+
+
+
+## Rough Design plan (before starting)
+
+<img width="1735" height="639" alt="image" src="https://github.com/user-attachments/assets/a3208765-244e-4e7b-8dee-33faae8b65e7" />
+
+
 ## Quickstart
 1) Install deps
    ```bash
@@ -67,3 +78,4 @@ firebase deploy --only firestore:rules
 - `pnpm stripe:listen`
 - `pnpm build:functions`
 - `pnpm deploy:functions`
+
