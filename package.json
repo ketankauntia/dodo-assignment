@@ -2,11 +2,18 @@
   "name": "dodo-assignment",
   "version": "0.1.0",
   "private": true,
+  "config": {
+    "project": "REPLACE_ME_PROJECT_ID"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "emulators": "npx firebase-tools emulators:start --only functions,firestore,auth --project $npm_package_config_project",
+    "stripe:listen": "stripe listen --forward-to http://127.0.0.1:5001/$npm_package_config_project/asia-south1/stripeWebhook",
+    "build:functions": "cd functions && npm run build",
+    "deploy:functions": "cd functions && npm run build && firebase deploy --only functions --project $npm_package_config_project"
   },
   "dependencies": {
     "firebase": "^12.1.0",
