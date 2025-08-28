@@ -134,8 +134,8 @@ export default function PricingPage() {
                     plan.code === 'FREE'
                       ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
                       : plan.code === 'PRO_YEAR'
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-900 text-white hover:bg-gray-800'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                      : 'bg-gray-900 text-white hover:bg-gray-800 cursor-pointer'
                   } ${loading === plan.code ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {loading === plan.code ? (
@@ -159,7 +159,7 @@ export default function PricingPage() {
             <p className="text-gray-600 mb-4">Sign in to choose a plan</p>
             <button
               onClick={() => window.location.href = '/'}
-              className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 cursor-pointer transition-colors"
             >
               Sign In
             </button>
