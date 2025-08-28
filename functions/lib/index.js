@@ -40,17 +40,18 @@ exports.stripeWebhook = exports.billingPortal = exports.createCheckoutSession = 
 // functions/src/index.ts
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const firestore_1 = require("firebase-admin/firestore");
 const stripe_1 = __importDefault(require("stripe"));
 const plans_server_1 = require("./plans.server");
 admin.initializeApp();
 const REGION = "asia-south1"; // your Firebase region (Mumbai)
 const APP_URL = process.env.APP_URL || "http://localhost:3000";
 const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2024-06-20",
+    apiVersion: "2023-10-16",
 });
 // ---------- Helpers ----------
-const db = admin.firestore();
-const ts = (unixSeconds) => admin.firestore.Timestamp.fromMillis(unixSeconds * 1000);
+const db = (0, firestore_1.getFirestore)();
+const ts = (unixSeconds) => firestore_1.Timestamp.fromMillis(unixSeconds * 1000);
 async function uidFromCustomer(customerId) {
     var _a;
     try {
@@ -94,10 +95,10 @@ exports.onUserCreate = functions
         plan: "free",
         plan_code: "FREE",
         plan_status: "active",
-        plan_start_date: admin.firestore.FieldValue.serverTimestamp(),
+        plan_start_date: firestore_1.FieldValue.serverTimestamp(),
         plan_end_date: null,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firestore_1.FieldValue.serverTimestamp(),
+        createdAt: firestore_1.FieldValue.serverTimestamp(),
     }, { merge: true });
 });
 // ---------- 2) Create Checkout Session (subscription or one-time) ----------
@@ -203,9 +204,7 @@ exports.stripeWebhook = functions
     const sig = req.headers["stripe-signature"];
     let event;
     try {
-        event = stripe.webhooks.constructEvent(
-        // @ts-expect-error rawBody exists in CF environment
-        req.rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
+        event = stripe.webhooks.constructEvent(req.rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
     }
     catch (err) {
         console.error("Webhook signature verification failed:", err.message);
@@ -232,9 +231,9 @@ exports.stripeWebhook = functions
                         plan: "free",
                         plan_code: "FREE",
                         plan_status: "active",
-                        plan_start_date: admin.firestore.FieldValue.serverTimestamp(),
+                        plan_start_date: firestore_1.FieldValue.serverTimestamp(),
                         plan_end_date: null,
-                        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firestore_1.FieldValue.serverTimestamp(),
                     }, { merge: true });
                 }
                 else {
@@ -260,7 +259,7 @@ exports.stripeWebhook = functions
                                 cancel_at_period_end: sub.cancel_at_period_end,
                             },
                         ],
-                        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firestore_1.FieldValue.serverTimestamp(),
                     }, { merge: true });
                 }
                 break;
@@ -294,7 +293,7 @@ exports.stripeWebhook = functions
                             const current = snap.get("credits") || 0;
                             tx.set(ref, {
                                 credits: current + add,
-                                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                                updatedAt: firestore_1.FieldValue.serverTimestamp(),
                             }, { merge: true });
                         });
                     }

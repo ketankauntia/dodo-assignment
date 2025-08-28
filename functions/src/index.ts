@@ -1,6 +1,11 @@
 // functions/src/index.ts
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import {
+  getFirestore,
+  FieldValue,
+  Timestamp,
+} from "firebase-admin/firestore";
 import Stripe from "stripe";
 import { PLAN_TO_STRIPE, PRICE_TO_CODE } from "./plans.server";
 
@@ -10,13 +15,12 @@ const REGION = "asia-south1"; // your Firebase region (Mumbai)
 const APP_URL = process.env.APP_URL || "http://localhost:3000";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-06-20",
+  apiVersion: "2023-10-16",
 });
 
 // ---------- Helpers ----------
-const db = admin.firestore();
-const ts = (unixSeconds: number) =>
-  admin.firestore.Timestamp.fromMillis(unixSeconds * 1000);
+const db = getFirestore();
+const ts = (unixSeconds: number) => Timestamp.fromMillis(unixSeconds * 1000);
 
 async function uidFromCustomer(customerId: string): Promise<string | null> {
   try {
@@ -62,10 +66,10 @@ export const onUserCreate = functions
         plan: "free",
         plan_code: "FREE",
         plan_status: "active",
-        plan_start_date: admin.firestore.FieldValue.serverTimestamp(),
+        plan_start_date: FieldValue.serverTimestamp(),
         plan_end_date: null,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
@@ -185,8 +189,7 @@ export const stripeWebhook = functions
     let event: Stripe.Event;
     try {
       event = stripe.webhooks.constructEvent(
-        // @ts-expect-error rawBody exists in CF environment
-        req.rawBody,
+        (req as any).rawBody,
         sig!,
         process.env.STRIPE_WEBHOOK_SECRET!
       );
@@ -222,9 +225,9 @@ export const stripeWebhook = functions
                 plan: "free",
                 plan_code: "FREE",
                 plan_status: "active",
-                plan_start_date: admin.firestore.FieldValue.serverTimestamp(),
+                plan_start_date: FieldValue.serverTimestamp(),
                 plan_end_date: null,
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                updatedAt: FieldValue.serverTimestamp(),
               },
               { merge: true }
             );
@@ -254,7 +257,7 @@ export const stripeWebhook = functions
                     cancel_at_period_end: sub.cancel_at_period_end,
                   },
                 ],
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                updatedAt: FieldValue.serverTimestamp(),
               },
               { merge: true }
             );
@@ -300,7 +303,7 @@ export const stripeWebhook = functions
                   ref,
                   {
                     credits: current + add,
-                    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: FieldValue.serverTimestamp(),
                   },
                   { merge: true }
                 );
