@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Link from 'next/link';
+import { linkStyles } from '@/lib/ui-utils';
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* Left side - App name/logo */}
           <div className="flex-shrink-0">
-            <Link href="/" className="text-white text-xl font-bold hover:text-gray-300 transition-colors">
+            <Link href="/" className={linkStyles.brand}>
               Dodo Payments Demo
             </Link>
           </div>
@@ -36,15 +37,15 @@ export default function Navbar() {
             <div className="ml-10 flex items-baseline space-x-4">
               <Link 
                 href="/pricing" 
-                className="text-gray-300 hover:text-white hover:underline px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className={linkStyles.navbar}
               >
                 Pricing
               </Link>
               
               {user && (
                 <Link 
-                  href="/login" 
-                  className="text-gray-300 hover:text-white hover:underline px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  href="/dashboard" 
+                  className={linkStyles.navbar}
                 >
                   Dashboard
                 </Link>
@@ -57,7 +58,7 @@ export default function Navbar() {
                   </span>
                   <button
                     onClick={handleSignOut}
-                    className="text-gray-300 hover:text-white hover:underline px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                    className={linkStyles.navbar}
                   >
                     Logout
                   </button>
@@ -65,7 +66,7 @@ export default function Navbar() {
               ) : (
                 <Link 
                   href="/login" 
-                  className="text-gray-300 hover:text-white hover:underline px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  className={linkStyles.navbar}
                 >
                   Login
                 </Link>
@@ -77,7 +78,7 @@ export default function Navbar() {
           <div className="md:hidden">
             <button
               onClick={toggleMobileMenu}
-              className="text-gray-300 hover:text-white focus:outline-none focus:text-white"
+              className="text-gray-300 hover:text-white focus:outline-none focus:text-white cursor-pointer"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMobileMenuOpen ? (
@@ -96,7 +97,7 @@ export default function Navbar() {
             <div className="px-2 pt-2 pb-3 space-y-1 border-t border-gray-800">
               <Link 
                 href="/pricing" 
-                className="text-gray-300 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                className={linkStyles.navbarMobile}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Pricing
@@ -104,8 +105,8 @@ export default function Navbar() {
               
               {user && (
                 <Link 
-                  href="/login" 
-                  className="text-gray-300 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                  href="/dashboard" 
+                  className={linkStyles.navbarMobile}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Dashboard
@@ -122,7 +123,7 @@ export default function Navbar() {
                       handleSignOut();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="text-gray-300 hover:text-white hover:bg-gray-800 block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    className={`${linkStyles.navbarMobile} w-full text-left`}
                   >
                     Logout
                   </button>
@@ -130,7 +131,7 @@ export default function Navbar() {
               ) : (
                 <Link 
                   href="/login" 
-                  className="text-gray-300 hover:text-white hover:bg-gray-800 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                  className={linkStyles.navbarMobile}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Login
